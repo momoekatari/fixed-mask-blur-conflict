@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Mask + Scrolling Blur Demo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            /* Must use a consistent background image */
+            background-image: url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* Global background dim overlay (Key 3) */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: #000;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        /* Fixed top overlay mask */
+        .fixed-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            z-index: 10;
+            pointer-events: none;
+            
+            /* Key 1: Sync background image with fixed attachment for pixel alignment */
+            background-image: url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center top;
+            background-attachment: fixed;
+            
+            /* Key 2: Use mask-image for true transparent crop, not a gradient overlay */
+            -webkit-mask-image: linear-gradient(to bottom, black 0, black 70px, transparent 100px);
+            mask-image: linear-gradient(to bottom, black 0, black 70px, transparent 100px);
+        }
+
+        /* Key 3: If base layer has overlay, mask must also have it to match colors */
+        .fixed-mask::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #000;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* Scrollable content area */
+        .scroll-container {
+            height: 100vh;
+            overflow-y: auto;
+            padding: 120px 20px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Backdrop-filter glassmorphism element */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            font-size: 16px;
+            line-height: 1.6;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Spacer for scrolling test */
+        .spacer {
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed Mask Layer -->
+    <div class="fixed-mask"></div>
+
+    <!-- Scrollable Content -->
+    <div class="scroll-container">
+        <div class="spacer">↓ Scroll down to see the effect ↓</div>
+        
+        <div class="glass-card">Glass Element 1: Scroll through the top mask area to see seamless rendering.</div>
+        <div class="glass-card">Glass Element 2: The backdrop-filter applies to the true underlying pixels.</div>
+        <div class="glass-card">Glass Element 3: No sudden color jumps or flickering occurs.</div>
+        
+        <div class="spacer"></div>
+        <div class="glass-card">Glass Element 4: The mask uses mask-image for true transparency crop.</div>
+        <div class="glass-card">Glass Element 5: The background-attachment: fixed keeps pixels perfectly aligned.</div>
+        <div class="glass-card">Glass Element 6: Clean edge, zero visual artifacts.</div>
+        <div class="spacer"></div>
+    </div>
+</body>
+</html>
